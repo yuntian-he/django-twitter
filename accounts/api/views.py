@@ -16,7 +16,6 @@ from django.contrib.auth import (
 )
 
 
-
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -45,10 +44,10 @@ class AccountViewSet(viewsets.ViewSet):
 
         user = serializer.save()
         django_login(request, user)
+
         return Response({'success': True,
                          'user': UserSerializer(user).data,
-                         'password': request.data,
-                         }, status=201)
+                         }, status = 201)
 
     @action(methods=['POST'], detail=False)
     def login(self, request):
@@ -82,7 +81,9 @@ class AccountViewSet(viewsets.ViewSet):
         """
         check current user's status and detail information
         """
-        data = {'has_logged_in': request.user.is_authenticated}
+        data = {
+            'has_logged_in': request.user.is_authenticated,
+            }
         if request.user.is_authenticated:
             data['user'] = UserSerializer(request.user).data
         return Response(data)

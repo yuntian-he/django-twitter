@@ -52,7 +52,7 @@ class AccountApiTests(TestCase):
 
     def test_logout(self):
 
-        response = self.client.get(LOGIN_URL, {
+        self.client.post(LOGIN_URL, {
             'username': self.user.username,
             'password': 'correct password',
         })
@@ -65,7 +65,7 @@ class AccountApiTests(TestCase):
         response = self.client.post(LOGOUT_URL)
         self.assertEqual(response.status_code, 200)
 
-        response - self.client.get(LOGIN_STATUS_URL)
+        response = self.client.get(LOGIN_STATUS_URL)
         self.assertEqual(response.data['has_logged_in'], False)
 
     def test_signup(self):
