@@ -1,4 +1,4 @@
-from django.test import TestCase
+from testing.testcases import TestCase
 from rest_framework.test import APIClient
 from django.contrib.auth.models import User
 
@@ -13,14 +13,11 @@ class AccountApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = self.createUser(
+        self.user = self.create_user(
             username='admin',
             email='admin@jiuzhang.com',
             password='correct password',
         )
-
-    def createUser(self, username, email, password):
-        return User.objects.create_user(username, email, password)
 
     def test_login(self):
 
