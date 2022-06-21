@@ -7,11 +7,11 @@ COMMENT_URL = '/api/comments/'
 class CommentApiTests(TestCase):
 
     def setUp(self):
-        self.user1 = self.create_user('user1')
+        self.user1 = self.create_user('linghu')
         self.user1_client = APIClient()
         self.user1_client.force_authenticate(self.user1)
 
-        self.user2 = self.create_user('user2')
+        self.user2 = self.create_user('dongxie')
         self.user2_client = APIClient()
         self.user2_client.force_authenticate(self.user2)
 

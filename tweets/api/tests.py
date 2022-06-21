@@ -11,13 +11,13 @@ class TweetApiTests(TestCase):
     def setUp(self):
         self.anonymous_client = APIClient()
 
-        self.user1 = self.create_user('user1', 'user@jiuzhang.com')
+        self.user1 = self.create_user('user1', 'user@gmail.com')
         self.tweets1 = [self.create_tweet(self.user1) for i in range(3)]
 
         self.user1_client = APIClient()
         self.user1_client.force_authenticate(self.user1)
 
-        self.user2 = self.create_user('user2', 'user2@jiuzhang.com')
+        self.user2 = self.create_user('user2', 'user2@gmail.com')
         self.tweets2 = [self.create_tweet(self.user2) for i in range(2)]
 
     def test_list_api(self):
