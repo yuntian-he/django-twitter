@@ -12,7 +12,7 @@ FOLLOWINGS_URL = '/api/friendships/{}/followings/'
 class FriendshipApiTests(TestCase):
     def setUp(self):
         # super(FriendshipApiTests, self).setUp()
-        self.anonymous_client = APIClient()
+        # self.anonymous_client = APIClient()
 
         self.linghu = self.create_user(
             username='linghu',
