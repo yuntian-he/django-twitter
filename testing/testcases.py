@@ -3,6 +3,9 @@ from django.test import TestCase as DjangoTestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from tweets.models import Tweet
+from django.contrib.contenttypes.models import ContentType
+from likes.models import Like
+from newsfeeds.models import NewsFeed
 
 
 class TestCase(DjangoTestCase):
@@ -31,5 +34,20 @@ class TestCase(DjangoTestCase):
             content = 'default comment content'
         return Comment.objects.create(user=user, tweet=tweet, content=content)
 
+    def create_like(self, user, target):
+        instance, _ = Like.objects.get_or_create(
+            content_type=ContentType.objects.get_for_model(target.__class__),
+            object_id=target.id,
+            user=user,
+        )
+        return instance
 
+    def create_user_and_client(self, *args, **kwargs):
+        user = self.create_user(*args, **kwargs)
+        client = APIClient()
+        client.force_authenticate(user)
+        return user,
+
+    def create_newsfeed(self, user, tweet):
+        return NewsFeed.objects.create(user=user, tweet=tweet)
 

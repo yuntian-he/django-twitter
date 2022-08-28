@@ -4,13 +4,15 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from comments.models import Comment
 from comments.api.serializers import (CommentSerializer,
                                       CommentSerializerForCreate,
-                                      CommentSerializerForUpdate)
+                                      CommentSerializerForUpdate,)
 from comments.api.permissions import IsObjectOwner
+from utils.decorators import required_params
 
 
 class CommentViewSet(viewsets.GenericViewSet):
     serializer_class = CommentSerializerForCreate
     queryset = Comment.objects.all()
+    filterset_fields = ('tweet_id',)
 
     def get_permissions(self):
         if self.action == 'create':
@@ -36,8 +38,8 @@ class CommentViewSet(viewsets.GenericViewSet):
 
         comment = serializer.save()
         return Response(
-            CommentSerializer(comment).data,
-            status=status.HTTP_201_CREATED
+            CommentSerializer(comment, context={'request': request}).data,
+            status=status.HTTP_201_CREATED,
         )
 
     def update(self, request, *args, **kwargs):
@@ -45,21 +47,32 @@ class CommentViewSet(viewsets.GenericViewSet):
             instance=self.get_object(),
             data=request.data,
         )
-        if not serializer.is_valid:
+        if not serializer.is_valid():
             return Response({
                 'message': 'Please check input',
-                'errors': serializer.errors,
-            }, status = status.HTTP_400_BAD_REQUEST)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         comment = serializer.save()
         return Response(
-            CommentSerializer(comment).data,
-            status = status.HTTP_200_OK,
+            CommentSerializer(comment, context={'request': request}).data,
+            status=status.HTTP_200_OK,
         )
 
     def destroy(self, request, *args, **kwargs):
         comment = self.get_object()
         comment.delete()
         return Response({'success': True}, status=status.HTTP_200_OK)
+
+    @required_params(params=['tweet_id'])
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        comments = self.filter_queryset(queryset).order_by('created_at')
+        serializer = CommentSerializer(comments,
+                                       context={'request': request},
+                                       many=True,)
+        return Response(
+            {'comments':serializer.data},
+            status=status.HTTP_200_OK,
+        )
 
 

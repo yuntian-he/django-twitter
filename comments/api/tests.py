@@ -1,10 +1,13 @@
-from datetime import timezone
+from django.utils import timezone
 from testing.testcases import TestCase
 from rest_framework.test import APIClient
 from comments.models import Comment
 
 
 COMMENT_URL = '/api/comments/'
+TWEET_LIST_API = '/api/tweets/'
+TWEET_DETAILS_API = '/api/tweets/{}/'
+NEWSFEED_LIST_API = '/api/newsfeeds/'
 
 
 class CommentApiTests(TestCase):
@@ -100,3 +103,49 @@ class CommentApiTests(TestCase):
         self.assertEqual(comment.created_at, before_created_at)
         self.assertNotEqual(comment.created_at, now)
         self.assertNotEqual(comment.updated_at, before_updated_at)
+
+    def test_list(self):
+        response = self.anonymous_client.get(COMMENT_URL)
+        self.assertEqual(response.status_code, 400)
+
+        response = self.anonymous_client.get(COMMENT_URL, {
+            'tweet_id': self.tweet.id,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['comments']), 0)
+
+        self.create_comment(self.linghu, self.tweet, '1')
+        self.create_comment(self.dongxie, self.tweet, '2')
+        self.create_comment(self.dongxie, self.create_tweet(self.dongxie), '3')
+        response = self.anonymous_client.get(COMMENT_URL, {
+            'tweet_id': self.tweet.id,
+        })
+
+        self.assertEqual(len(response.data['comments']), 2)
+        self.assertEqual(response.data['comments'][0]['content'], '1')
+        self.assertEqual(response.data['comments'][1]['content'], '2')
+
+        response = self.anonymous_client.get(COMMENT_URL, {
+            'tweet_id': self.tweet.id,
+            'user_id': self.linghu.id,
+        })
+        self.assertEqual(len(response.data['comments']), 2)
+
+    def test_comments_count(self):
+        tweet = self.create_tweet(self.linghu)
+        url = TWEET_DETAILS_API.format(tweet.id)
+        response = self.dongxie_client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['comments_count'], 0)
+
+        self.create_comment(self.linghu, tweet)
+        response = self.dongxie_client.get(TWEET_LIST_API, {'user_id': self.linghu.id})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['tweets'][0]['comments_count'], 1)
+
+        self.create_comment(self.dongxie, tweet)
+        self.create_newsfeed(self.dongxie, tweet)
+        response = self.dongxie_client.get(NEWSFEED_LIST_API)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['newsfeeds'][0]['tweet']['comments_count'], 2)
+
