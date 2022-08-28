@@ -37,18 +37,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'rest_framework',
     'debug_toolbar',
     'accounts',
     'tweets',
     'friendships',
     'newsfeeds',
-    'comments'
+    'comments',
+    'likes',
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ]
 }
 
 MIDDLEWARE = [
@@ -138,3 +143,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # AUTH_USER_MODEL = "accounts.User"
+
+try:
+    from .local_setting import *
+except:
+    pass

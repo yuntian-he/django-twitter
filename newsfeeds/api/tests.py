@@ -4,6 +4,7 @@ from rest_framework.test import APIClient
 from testing.testcases import TestCase
 
 
+
 NEWSFEEDS_URL = '/api/newsfeeds/'
 POST_TWEETS_URL = '/api/tweets/'
 FOLLOW_URL = '/api/friendships/{}/follow/'
