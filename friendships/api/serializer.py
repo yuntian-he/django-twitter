@@ -3,6 +3,7 @@ from rest_framework import serializers
 from accounts.api.serializers import UserSerializer
 from friendships.models import Friendship
 from rest_framework.exceptions import ValidationError
+from accounts.api.serializers import UserSerializerForFriendship
 
 
 class FriendshipSerializerForCreate(serializers.ModelSerializer):
@@ -30,7 +31,7 @@ class FriendshipSerializerForCreate(serializers.ModelSerializer):
 
 
 class FollowerSerializer(serializers.ModelSerializer):
-    user = UserSerializer(source='from_user')
+    user = UserSerializerForFriendship(source='from_user')
     # user = serializers(source='from_user')
     created_at = serializers.DateTimeField()
 
@@ -40,7 +41,7 @@ class FollowerSerializer(serializers.ModelSerializer):
 
 
 class FollowingSerializer(serializers.ModelSerializer):
-    user = UserSerializer(source='to_user')
+    user = UserSerializerForFriendship(source='to_user')
     # user = serializers(source='from_user')
     created_at = serializers.DateTimeField()
 

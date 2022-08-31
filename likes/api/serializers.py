@@ -5,11 +5,12 @@ from likes.models import Like
 from rest_framework.exceptions import ValidationError
 from tweets.models import Tweet
 from rest_framework import serializers
+from accounts.api.serializers import UserSerializerForLike
 
 
 
 class LikeSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserSerializerForLike()
 
     class Meta:
         model = Like
@@ -43,14 +44,22 @@ class BaseLikeSerializerForCreateAndCancel(serializers.ModelSerializer):
 
 class LikeSerializerForCreate(BaseLikeSerializerForCreateAndCancel):
 
-    def create(self, validated_data):
-        model_class = self._get_model_class(validated_data)
-        instance, _ = Like.objects.get_or_create(
+    # def create(self, validated_data):
+    #     model_class = self._get_model_class(validated_data)
+    #     instance, _ = Like.objects.get_or_create(
+    #         content_type=ContentType.objects.get_for_model(model_class),
+    #         object_id=validated_data['object_id'],
+    #         user=self.context['request'].user,
+    #     )
+    #     return instance
+
+    def get_or_create(self):
+        model_class = self._get_model_class(self.validated_data)
+        return Like.objects.get_or_create(
             content_type=ContentType.objects.get_for_model(model_class),
-            object_id=validated_data['object_id'],
+            object_id=self.validated_data['object_id'],
             user=self.context['request'].user,
         )
-        return instance
 
 
 class LikeSerializerForCancel(BaseLikeSerializerForCreateAndCancel):
