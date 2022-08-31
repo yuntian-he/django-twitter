@@ -10,6 +10,7 @@ from utils.decorators import required_params
 from inbox.services import NotificationService
 
 
+
 class CommentViewSet(viewsets.GenericViewSet):
     serializer_class = CommentSerializerForCreate
     queryset = Comment.objects.all()

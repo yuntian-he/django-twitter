@@ -5,11 +5,12 @@ from likes.models import Like
 from rest_framework.exceptions import ValidationError
 from tweets.models import Tweet
 from rest_framework import serializers
+from accounts.api.serializers import UserSerializerForLike
 
 
 
 class LikeSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserSerializerForLike()
 
     class Meta:
         model = Like
